@@ -1,0 +1,97 @@
+# Laravel Mock API
+
+File-backed mock API responses with a zero-config management panel — for building frontend features against endpoints your backend hasn't built yet.
+
+No database, no migrations. Every mock endpoint (method, path, status code, response body) is stored in a single JSON file and served by a catch-all route. A built-in panel lets you create, edit, and delete mocks through the browser, with a syntax-highlighted JSON editor — no dependency on your host app's frontend stack (works the same whether your app uses Blade, Inertia+React, Vue, or nothing at all).
+
+## Requirements
+
+- PHP 8.2+
+- Laravel 10, 11, 12, or 13
+
+## Installation
+
+```bash
+composer require saimain/laravel-mock-api
+```
+
+That's it. The service provider is auto-discovered — no manual registration, no `.env` changes required. Out of the box:
+
+- Mock endpoints are served under `/api/{path}`
+- The management panel is available at `/mock-panel`
+- Mocks are stored in `storage/app/mock-api/responses.json`
+
+## Usage
+
+1. Visit `/mock-panel` in your browser.
+2. Click **+ New endpoint**.
+3. Fill in:
+   - **Method** — `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`
+   - **Path** — relative to your API prefix, e.g. `xpress/trips` → served at `/api/xpress/trips`
+   - **Status code** — the HTTP status to respond with
+   - **Response body** — any valid JSON, edited in a syntax-highlighted editor with a *Format* button
+4. Save. The endpoint is live immediately at the path you configured.
+
+```bash
+curl http://your-app.test/api/xpress/trips
+```
+
+```json
+{
+  "success": true,
+  "message": "",
+  "data": {
+    "locations": [
+      { "id": 1, "name": "Yangon" },
+      { "id": 2, "name": "Mandalay" }
+    ]
+  }
+}
+```
+
+Requesting a method/path combination that hasn't been defined returns a `404`:
+
+```json
+{ "success": false, "message": "Mock endpoint not found." }
+```
+
+Because mocks are served from whatever path you choose, frontend code can call the real, future API path from day one — no find-and-replace needed once the backend actually implements it.
+
+## Configuration
+
+No configuration is required to get started. To customize prefixes, middleware, or storage location, publish the config file:
+
+```bash
+php artisan vendor:publish --tag=mock-api-config
+```
+
+This creates `config/mock-api.php`:
+
+| Key | Env variable | Default | Description |
+| --- | --- | --- | --- |
+| `enabled` | `MOCK_API_ENABLED` | `true` | Set to `false` to disable the package entirely (e.g. in production) without uninstalling it. |
+| `api_prefix` | `MOCK_API_PREFIX` | `api` | Prefix mock endpoints are served under. |
+| `panel_prefix` | `MOCK_API_PANEL_PREFIX` | `mock-panel` | Prefix the management panel is served under. |
+| `api_middleware` | — | `['api']` | Middleware applied to the mock endpoint route group. |
+| `panel_middleware` | — | `['web']` | Middleware applied to the panel route group. The panel ships with no authentication — add your own via this array if it needs protecting. |
+| `storage_path` | — | `storage_path('app/mock-api/responses.json')` | Where the JSON manifest of mock responses is stored. |
+
+Most of the time, setting the two env variables is enough — publishing the config file is only needed if you want to change middleware or storage location.
+
+## How it avoids colliding with your real routes
+
+The catch-all mock route (`ANY /api/{path}`) registers itself *after* every other service provider has booted, so any route your application defines explicitly — `/api/user`, `/api/xpress/ping`, etc. — always takes priority. The mock route only ever handles requests that don't match anything else in your app.
+
+## Disabling in production
+
+Set in your `.env`:
+
+```
+MOCK_API_ENABLED=false
+```
+
+This skips route registration entirely — no mock endpoints and no panel.
+
+## License
+
+MIT.
