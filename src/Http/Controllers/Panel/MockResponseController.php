@@ -57,6 +57,31 @@ class MockResponseController extends Controller
             ->with('status', 'Mock endpoint deleted.');
     }
 
+    public function docsIndex(MockResponseStore $store): View|RedirectResponse
+    {
+        $entries = $this->sidebarEntries($store);
+
+        if ($entries->isEmpty()) {
+            return view('mock-api::panel.mock-responses.docs-empty', [
+                'entries' => $entries,
+                'sidebarItemRoute' => 'mock-api.panel.docs.show',
+            ]);
+        }
+
+        return redirect()->route('mock-api.panel.docs.show', $entries->first()['id']);
+    }
+
+    public function docsShow(int $mockResponse, MockResponseStore $store): View
+    {
+        $entry = $store->find($mockResponse) ?? abort(404);
+
+        return view('mock-api::panel.mock-responses.docs', [
+            'entry' => $entry,
+            'entries' => $this->sidebarEntries($store),
+            'sidebarItemRoute' => 'mock-api.panel.docs.show',
+        ]);
+    }
+
     protected function sidebarEntries(MockResponseStore $store): Collection
     {
         return collect($store->all())->sortBy('path')->values();

@@ -8,6 +8,7 @@
             <h1>{{ $entry['method'] }} <code>/{{ config('mock-api.api_prefix') }}/{{ $entry['path'] }}</code></h1>
             <p class="subtitle">Update the method, path, or response body.</p>
         </div>
+        <a href="{{ route('mock-api.panel.docs.show', $entry['id']) }}" class="btn btn-secondary">View docs</a>
     </div>
 
     @if (session('status'))

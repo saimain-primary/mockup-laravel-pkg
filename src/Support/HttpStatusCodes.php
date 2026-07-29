@@ -94,4 +94,15 @@ class HttpStatusCodes
 
         return false;
     }
+
+    public static function phrase(int $code): ?string
+    {
+        foreach (self::grouped() as $codes) {
+            if (array_key_exists($code, $codes)) {
+                return $codes[$code][0];
+            }
+        }
+
+        return null;
+    }
 }
