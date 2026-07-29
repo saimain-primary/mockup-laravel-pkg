@@ -12,6 +12,7 @@
 
     $activeTab = ($errors->has('validation_rules') && ! $errors->has('response')) ? 'validation' : 'response';
     $prefix = '/'.config('mock-api.api_prefix').'/';
+    $baseUrl = rtrim(config('app.url'), '/');
 
     $statusCodes = \Saimain\LaravelMockApi\Support\HttpStatusCodes::grouped();
     $showCustomStatus = ! \Saimain\LaravelMockApi\Support\HttpStatusCodes::isKnown((int) $status);
@@ -47,7 +48,19 @@
             </div>
         </div>
 
-        <p class="url-bar__preview">Live at <code data-path-preview data-prefix="{{ $prefix }}">{{ $prefix }}{{ $path }}</code></p>
+        <p class="url-bar__preview">
+            Live at
+            <a
+                href="{{ $baseUrl }}{{ $prefix }}{{ $path }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="url-bar__preview-link"
+                data-path-preview
+                data-prefix="{{ $prefix }}"
+                data-base-url="{{ $baseUrl }}"
+                title="Open in a new tab (sends a GET request)"
+            ><code>{{ $prefix }}{{ $path }}</code><svg class="external-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8 4H5.5A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16h9a1.5 1.5 0 0 0 1.5-1.5V12M12 4h4v4M16 4l-7 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </p>
 
         @error('path')
             <p class="field-error">{{ $message }}</p>

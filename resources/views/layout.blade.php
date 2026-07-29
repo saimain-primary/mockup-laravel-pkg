@@ -210,7 +210,16 @@
             }
             .url-bar__input:focus { outline: none; }
             .url-bar__preview { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
-            .url-bar__preview code { color: var(--fg); background: color-mix(in srgb, var(--accent) 8%, transparent); padding: 1px 6px; border-radius: 4px; }
+            .url-bar__preview-link {
+                display: inline-flex; align-items: center; gap: 4px; color: inherit;
+            }
+            .url-bar__preview-link:hover { color: var(--accent); text-decoration: none; }
+            .url-bar__preview-link code {
+                color: var(--fg); background: color-mix(in srgb, var(--accent) 8%, transparent);
+                padding: 1px 6px; border-radius: 4px; transition: color 150ms ease;
+            }
+            .url-bar__preview-link:hover code { color: var(--accent); }
+            .url-bar__preview-link .external-icon { width: 12px; height: 12px; flex-shrink: 0; }
 
             .status-field { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
             select.status-select { flex: 1; min-width: 220px; width: auto; height: 40px; cursor: pointer; }
@@ -457,13 +466,17 @@
                 }
 
                 var pathInput = document.getElementById('path');
-                var pathPreview = document.querySelector('[data-path-preview]');
+                var pathPreviewLink = document.querySelector('[data-path-preview]');
+                var pathPreviewCode = pathPreviewLink ? pathPreviewLink.querySelector('code') : null;
 
-                if (pathInput && pathPreview) {
-                    var prefix = pathPreview.getAttribute('data-prefix') || '/';
+                if (pathInput && pathPreviewLink && pathPreviewCode) {
+                    var prefix = pathPreviewLink.getAttribute('data-prefix') || '/';
+                    var baseUrl = pathPreviewLink.getAttribute('data-base-url') || '';
 
                     function updatePathPreview() {
-                        pathPreview.textContent = prefix + pathInput.value.replace(/^\/+/, '');
+                        var suffix = prefix + pathInput.value.replace(/^\/+/, '');
+                        pathPreviewCode.textContent = suffix;
+                        pathPreviewLink.href = baseUrl + suffix;
                     }
 
                     pathInput.addEventListener('input', updatePathPreview);
