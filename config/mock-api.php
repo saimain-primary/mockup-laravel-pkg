@@ -16,4 +16,13 @@ return [
 
     // Where the JSON manifest of mock responses is stored.
     'storage_path' => storage_path('app/mock-api/responses.json'),
+
+    // Starting template pre-filled into a new endpoint's response body in the
+    // panel. Purely a convenience default — each endpoint's response is still
+    // freely editable and can deviate from this shape entirely.
+    'default_response' => [
+        'success' => true,
+        'message' => 'Mockup Response',
+        'data' => null,
+    ],
 ];
