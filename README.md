@@ -23,9 +23,8 @@ That's it. The service provider is auto-discovered — no manual registration, n
 
 ## Usage
 
-1. Visit `/mock-panel` in your browser.
-2. Click **+ New endpoint**.
-3. Fill in:
+1. Visit `/mock-panel` in your browser — it opens straight into a new endpoint form, with existing endpoints listed in the sidebar (click one to edit it, or the **+** button to start another).
+2. Fill in:
    - **Method** — `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`
    - **Path** — relative to your API prefix, e.g. `xpress/trips` → served at `/api/xpress/trips`
    - **Status code** — the HTTP status to respond with
