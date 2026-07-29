@@ -106,6 +106,7 @@ This creates `config/mock-api.php`:
 | `panel_middleware` | — | `['web']` | Middleware applied to the panel route group. The panel ships with no authentication — add your own via this array if it needs protecting. |
 | `storage_path` | — | `storage_path('app/mock-api/responses.json')` | Where the JSON manifest of mock responses is stored. |
 | `default_response` | — | `['success' => true, 'message' => 'Mockup Response', 'data' => null]` | Starting template pre-filled into a new endpoint's response body in the panel. Just a convenience default — each endpoint's response is still freely editable and can deviate from this shape entirely. |
+| `default_error_response` | — | `['success' => false, 'message' => null, 'data' => null]` | Base envelope for built-in error responses (mock not found, validation failure). `message` is always overwritten per error at request time; add extra keys here if your app's errors carry more than success/message/data. |
 
 Most of the time, setting the two env variables is enough — publishing the config file is only needed if you want to change middleware or storage location.
 

@@ -25,4 +25,14 @@ return [
         'message' => 'Mockup Response',
         'data' => null,
     ],
+
+    // Base envelope for built-in error responses (mock not found, validation
+    // failure). "message" is always overwritten per error at request time —
+    // its value here is just a placeholder. Add extra keys if your app's
+    // error responses carry more than success/message/data.
+    'default_error_response' => [
+        'success' => false,
+        'message' => null,
+        'data' => null,
+    ],
 ];
