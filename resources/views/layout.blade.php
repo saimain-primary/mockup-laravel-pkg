@@ -252,10 +252,12 @@
                 margin: 0; position: absolute; top: 0; right: 0; bottom: 0; left: 0; padding: 12px; overflow: auto;
                 font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; line-height: 1.6;
                 white-space: pre; tab-size: 4;
+                letter-spacing: normal; word-spacing: normal; font-kerning: none; font-variant-ligatures: none;
+                -webkit-font-smoothing: antialiased; text-rendering: optimizeSpeed;
             }
             .json-editor__highlight { color: var(--code-fg); pointer-events: none; }
             .json-editor__textarea {
-                width: 100%; height: 100%; resize: none; border: none; background: transparent; color: transparent;
+                resize: none; border: none; background: transparent; color: transparent;
                 caret-color: #fff;
             }
             .json-editor__textarea:focus { outline: none; }
