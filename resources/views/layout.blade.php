@@ -23,11 +23,6 @@
                 --error-fg: #b91c1c;
                 --code-bg: #282c34;
                 --code-fg: #abb2bf;
-                --tok-key: #e06c75;
-                --tok-string: #98c379;
-                --tok-number: #d19a66;
-                --tok-boolean: #56b6c2;
-                --tok-null: #5c6370;
                 --m-get: #2563eb;
                 --m-post: #15803d;
                 --m-put: #b45309;
@@ -131,7 +126,6 @@
             .btn-primary:hover { opacity: 0.92; border-color: var(--accent); }
             .btn-secondary { background: var(--panel); border-color: var(--border); color: var(--fg); }
             .btn-secondary:hover { border-color: var(--muted); }
-            .btn-text { border: none; background: none; color: var(--muted); padding: 8px 4px; }
             .btn-danger-text { border: none; background: none; color: var(--danger); padding: 0; font-size: 13px; cursor: pointer; }
             .alert { border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 20px; border: 1px solid; }
             .alert-success { background: var(--success-bg); border-color: var(--success-border); color: var(--success-fg); }
@@ -246,27 +240,16 @@
 
             .actions-row { display: flex; align-items: center; gap: 12px; margin-top: 24px; }
 
-            .json-editor { position: relative; height: 320px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--code-bg); transition: border-color 150ms ease; }
-            .json-editor--invalid { border-color: var(--danger); }
-            .json-editor pre, .json-editor textarea {
-                margin: 0; position: absolute; top: 0; right: 0; bottom: 0; left: 0; padding: 12px; overflow: auto;
+            .json-textarea {
+                display: block; width: 100%; height: 320px; margin: 0; padding: 12px; box-sizing: border-box;
+                border: 1px solid var(--border); border-radius: 8px; background: var(--code-bg); color: var(--code-fg);
                 font-family: 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace; font-size: 12.5px; line-height: 1.6;
-                white-space: pre; tab-size: 4;
-                letter-spacing: normal; word-spacing: normal; font-kerning: none; font-variant-ligatures: none;
-                -webkit-font-smoothing: antialiased; text-rendering: optimizeSpeed;
+                white-space: pre; tab-size: 4; overflow: auto; resize: vertical;
+                transition: border-color 150ms ease;
             }
-            .json-editor__highlight { color: var(--code-fg); pointer-events: none; }
-            .json-editor__textarea {
-                resize: none; border: none; background: transparent; color: transparent;
-                caret-color: #fff;
-            }
-            .json-editor__textarea:focus { outline: none; }
-            .tok-key { color: var(--tok-key); }
-            .tok-string { color: var(--tok-string); }
-            .tok-number { color: var(--tok-number); }
-            .tok-boolean { color: var(--tok-boolean); }
-            .tok-null { color: var(--tok-null); font-style: italic; }
-            .json-toolbar { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+            .json-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+            .json-textarea--invalid { border-color: var(--danger); }
+            .json-toolbar { display: flex; align-items: center; margin-top: 8px; }
             .json-status { font-size: 12px; }
             .json-status--ok { color: var(--success-fg); }
             .json-status--error { color: var(--error-fg); }
@@ -295,40 +278,8 @@
 
         <script>
             (function () {
-                function escapeHtml(str) {
-                    return str
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
-                }
-
-                function highlightJson(source) {
-                    var escaped = escapeHtml(source);
-
-                    return escaped.replace(
-                        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
-                        function (match) {
-                            var cls = 'tok-number';
-
-                            if (/^"/.test(match)) {
-                                cls = /:$/.test(match) ? 'tok-key' : 'tok-string';
-                            } else if (/^(true|false)$/.test(match)) {
-                                cls = 'tok-boolean';
-                            } else if (match === 'null') {
-                                cls = 'tok-null';
-                            }
-
-                            return '<span class="' + cls + '">' + match + '</span>';
-                        }
-                    );
-                }
-
-                function initEditor(root) {
-                    var textarea = root.querySelector('.json-editor__textarea');
-                    var highlight = root.querySelector('.json-editor__highlight');
-                    var code = highlight.querySelector('code');
-                    var statusEl = root.parentElement.querySelector('[data-json-status]');
-                    var formatBtn = root.parentElement.querySelector('[data-json-format]');
+                function initJsonField(textarea) {
+                    var statusEl = textarea.parentElement.querySelector('[data-json-status]');
 
                     function validate() {
                         try {
@@ -337,29 +288,17 @@
                                 statusEl.textContent = 'Valid JSON';
                                 statusEl.className = 'json-status json-status--ok';
                             }
-                            root.classList.remove('json-editor--invalid');
-                            return true;
+                            textarea.classList.remove('json-textarea--invalid');
                         } catch (e) {
                             if (statusEl) {
                                 statusEl.textContent = 'Invalid JSON — ' + e.message;
                                 statusEl.className = 'json-status json-status--error';
                             }
-                            root.classList.add('json-editor--invalid');
-                            return false;
+                            textarea.classList.add('json-textarea--invalid');
                         }
                     }
 
-                    function render() {
-                        code.innerHTML = highlightJson(textarea.value) + '\n';
-                        validate();
-                    }
-
-                    textarea.addEventListener('input', render);
-
-                    textarea.addEventListener('scroll', function () {
-                        highlight.scrollTop = textarea.scrollTop;
-                        highlight.scrollLeft = textarea.scrollLeft;
-                    });
+                    textarea.addEventListener('input', validate);
 
                     textarea.addEventListener('keydown', function (e) {
                         if (e.key === 'Tab') {
@@ -368,28 +307,14 @@
                             var end = textarea.selectionEnd;
                             textarea.value = textarea.value.slice(0, start) + '    ' + textarea.value.slice(end);
                             textarea.selectionStart = textarea.selectionEnd = start + 4;
-                            render();
+                            validate();
                         }
                     });
 
-                    if (formatBtn) {
-                        formatBtn.addEventListener('click', function () {
-                            try {
-                                textarea.value = JSON.stringify(JSON.parse(textarea.value), null, 4);
-                                render();
-                            } catch (e) {
-                                if (statusEl) {
-                                    statusEl.textContent = 'Cannot format — ' + e.message;
-                                    statusEl.className = 'json-status json-status--error';
-                                }
-                            }
-                        });
-                    }
-
-                    render();
+                    validate();
                 }
 
-                document.querySelectorAll('.json-editor').forEach(initEditor);
+                document.querySelectorAll('.json-textarea').forEach(initJsonField);
 
                 var methodSelect = document.getElementById('method');
 

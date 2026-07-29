@@ -14,18 +14,15 @@
     @endisset
 >
     <label for="{{ $name }}">{{ $label }} @isset($hint)<span class="hint">{{ $hint }}</span>@endisset</label>
-    <div class="json-editor @if ($hasError) json-editor--invalid @endif" style="height: {{ $height }};">
-        <pre class="json-editor__highlight" aria-hidden="true"><code></code></pre>
-        <textarea
-            id="{{ $name }}"
-            name="{{ $name }}"
-            class="json-editor__textarea"
-            spellcheck="false"
-            @if ($hasError) aria-invalid="true" @endif
-        >{{ $value }}</textarea>
-    </div>
+    <textarea
+        id="{{ $name }}"
+        name="{{ $name }}"
+        class="json-textarea @if ($hasError) json-textarea--invalid @endif"
+        style="height: {{ $height }};"
+        spellcheck="false"
+        @if ($hasError) aria-invalid="true" @endif
+    >{{ $value }}</textarea>
     <div class="json-toolbar">
-        <button type="button" class="btn btn-text" data-json-format>Format JSON</button>
         <span data-json-status class="json-status"></span>
     </div>
     @error($name)
