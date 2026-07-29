@@ -248,22 +248,14 @@
 
             .json-editor { position: relative; height: 320px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--code-bg); transition: border-color 150ms ease; }
             .json-editor--invalid { border-color: var(--danger); }
-            .json-editor__gutter {
-                position: absolute; top: 0; left: 0; bottom: 0; width: 44px; padding: 12px 8px;
-                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; line-height: 1.6;
-                white-space: pre; text-align: right; overflow: hidden; user-select: none;
-                color: color-mix(in srgb, var(--code-fg) 40%, transparent);
-                background: color-mix(in srgb, black 15%, var(--code-bg));
-                border-right: 1px solid color-mix(in srgb, var(--code-fg) 15%, transparent);
-            }
             .json-editor pre, .json-editor textarea {
-                margin: 0; position: absolute; top: 0; right: 0; bottom: 0; left: 44px; padding: 12px; overflow: auto;
+                margin: 0; position: absolute; top: 0; right: 0; bottom: 0; left: 0; padding: 12px; overflow: auto;
                 font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; line-height: 1.6;
                 white-space: pre; tab-size: 4;
             }
             .json-editor__highlight { color: var(--code-fg); pointer-events: none; }
             .json-editor__textarea {
-                width: calc(100% - 44px); height: 100%; resize: none; border: none; background: transparent; color: transparent;
+                width: 100%; height: 100%; resize: none; border: none; background: transparent; color: transparent;
                 caret-color: #fff;
             }
             .json-editor__textarea:focus { outline: none; }
@@ -332,7 +324,6 @@
                 function initEditor(root) {
                     var textarea = root.querySelector('.json-editor__textarea');
                     var highlight = root.querySelector('.json-editor__highlight');
-                    var gutter = root.querySelector('.json-editor__gutter');
                     var code = highlight.querySelector('code');
                     var statusEl = root.parentElement.querySelector('[data-json-status]');
                     var formatBtn = root.parentElement.querySelector('[data-json-format]');
@@ -356,22 +347,8 @@
                         }
                     }
 
-                    function renderGutter() {
-                        if (! gutter) return;
-
-                        var lineCount = textarea.value.split('\n').length;
-                        var lines = [];
-
-                        for (var i = 1; i <= lineCount; i++) {
-                            lines.push(i);
-                        }
-
-                        gutter.textContent = lines.join('\n');
-                    }
-
                     function render() {
                         code.innerHTML = highlightJson(textarea.value) + '\n';
-                        renderGutter();
                         validate();
                     }
 
@@ -380,7 +357,6 @@
                     textarea.addEventListener('scroll', function () {
                         highlight.scrollTop = textarea.scrollTop;
                         highlight.scrollLeft = textarea.scrollLeft;
-                        if (gutter) gutter.scrollTop = textarea.scrollTop;
                     });
 
                     textarea.addEventListener('keydown', function (e) {

@@ -15,7 +15,6 @@
 >
     <label for="{{ $name }}">{{ $label }} @isset($hint)<span class="hint">{{ $hint }}</span>@endisset</label>
     <div class="json-editor @if ($hasError) json-editor--invalid @endif" style="height: {{ $height }};">
-        <div class="json-editor__gutter" aria-hidden="true"></div>
         <pre class="json-editor__highlight" aria-hidden="true"><code></code></pre>
         <textarea
             id="{{ $name }}"
