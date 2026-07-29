@@ -21,13 +21,13 @@
                 --error-bg: #fef2f2;
                 --error-border: #fecaca;
                 --error-fg: #b91c1c;
-                --code-bg: #0f172a;
-                --code-fg: #e2e8f0;
-                --tok-key: #7dd3fc;
-                --tok-string: #86efac;
-                --tok-number: #fca5a5;
-                --tok-boolean: #fdba74;
-                --tok-null: #94a3b8;
+                --code-bg: #282c34;
+                --code-fg: #abb2bf;
+                --tok-key: #e06c75;
+                --tok-string: #98c379;
+                --tok-number: #d19a66;
+                --tok-boolean: #56b6c2;
+                --tok-null: #5c6370;
                 --m-get: #2563eb;
                 --m-post: #15803d;
                 --m-put: #b45309;
@@ -36,23 +36,26 @@
             }
             @media (prefers-color-scheme: dark) {
                 :root {
-                    --bg: #0b1120;
-                    --panel: #111827;
-                    --border: #1f2937;
-                    --fg: #e5e7eb;
-                    --muted: #9ca3af;
-                    --success-bg: #052e1f;
-                    --success-border: #065f46;
-                    --success-fg: #34d399;
-                    --error-bg: #2c0b0b;
-                    --error-border: #7f1d1d;
-                    --error-fg: #f87171;
-                    --code-bg: #05070d;
-                    --m-get: #60a5fa;
-                    --m-post: #4ade80;
-                    --m-put: #fbbf24;
-                    --m-patch: #a78bfa;
-                    --m-delete: #f87171;
+                    /* Atom "One Dark" palette */
+                    --bg: #282c34;
+                    --panel: #21252b;
+                    --border: #3b4048;
+                    --fg: #abb2bf;
+                    --muted: #5c6370;
+                    --accent: #61afef;
+                    --accent-fg: #282c34;
+                    --danger: #e06c75;
+                    --success-bg: #1f2b1d;
+                    --success-border: #3f6d36;
+                    --success-fg: #98c379;
+                    --error-bg: #2d2020;
+                    --error-border: #6f3a3f;
+                    --error-fg: #e06c75;
+                    --m-get: #61afef;
+                    --m-post: #98c379;
+                    --m-put: #d19a66;
+                    --m-patch: #c678dd;
+                    --m-delete: #e06c75;
                 }
             }
             * { box-sizing: border-box; }
@@ -264,6 +267,10 @@
             .json-status { font-size: 12px; }
             .json-status--ok { color: var(--success-fg); }
             .json-status--error { color: var(--error-fg); }
+
+            .app-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); text-align: center; }
+            .app-footer a { color: var(--muted); text-decoration: underline; }
+            .app-footer a:hover { color: var(--accent); }
         </style>
     </head>
     <body>
@@ -275,6 +282,10 @@
             <div class="main">
                 <div class="container">
                     @yield('content')
+
+                    <footer class="app-footer">
+                        Built by <a href="https://mm.linkedin.com/in/saimain" target="_blank" rel="noopener noreferrer">justsaimain</a>
+                    </footer>
                 </div>
             </div>
         </div>
