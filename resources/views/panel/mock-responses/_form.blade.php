@@ -3,7 +3,11 @@
     $path = old('path', $entry['path'] ?? '');
     $description = old('description', $entry['description'] ?? '');
     $status = old('status', $entry['status'] ?? 200);
-    $response = old('response', isset($entry) ? json_encode($entry['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : "{\n    \n}");
+    $response = old('response', isset($entry) ? json_encode($entry['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : json_encode([
+        'success' => true,
+        'message' => 'Mockup Response',
+        'data' => null,
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     $validationRules = old('validation_rules', ! empty($entry['validation_rules'] ?? null)
         ? json_encode($entry['validation_rules'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         : "{}");

@@ -18,6 +18,7 @@ class MockApiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Mock endpoint not found.',
+                'data' => null,
             ], 404);
         }
 
@@ -28,7 +29,9 @@ class MockApiController extends Controller
 
             if ($validator->fails()) {
                 return response()->json([
+                    'success' => false,
                     'message' => $validator->errors()->first(),
+                    'data' => null,
                     'errors' => $validator->errors(),
                 ], 422);
             }
