@@ -27,6 +27,7 @@ class MockResponseRequest extends FormRequest
         return [
             'method' => ['required', Rule::in(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])],
             'path' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9\-_\/]+$/i'],
+            'description' => ['nullable', 'string', 'max:500'],
             'status' => ['required', 'integer', 'between:100,599'],
             'validation_rules' => ['nullable', 'json'],
             'response' => ['required', 'json'],

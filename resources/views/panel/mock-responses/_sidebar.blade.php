@@ -24,11 +24,16 @@
             <a
                 href="{{ route('mock-api.panel.mock-responses.edit', $item['id']) }}"
                 class="sidebar__item @if ($isActive) sidebar__item--active @endif"
-                data-sidebar-search="{{ strtolower($item['method'].' /'.$item['path']) }}"
+                data-sidebar-search="{{ strtolower($item['method'].' /'.$item['path'].' '.($item['description'] ?? '')) }}"
                 @if ($isActive) aria-current="page" @endif
             >
-                <span class="method-badge method-badge--{{ strtolower($item['method']) }}">{{ $item['method'] }}</span>
-                <span class="sidebar__item-path">/{{ $item['path'] }}</span>
+                <span class="sidebar__item-row">
+                    <span class="method-badge method-badge--{{ strtolower($item['method']) }}">{{ $item['method'] }}</span>
+                    <span class="sidebar__item-path">/{{ $item['path'] }}</span>
+                </span>
+                @if (! empty($item['description']))
+                    <span class="sidebar__item-description">{{ $item['description'] }}</span>
+                @endif
             </a>
         @empty
             <p class="sidebar__empty">No endpoints yet — create your first one.</p>

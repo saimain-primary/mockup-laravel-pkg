@@ -68,7 +68,7 @@
             }
             .app-shell { display: flex; min-height: 100vh; }
             .main { flex: 1; min-width: 0; }
-            .container { max-width: 760px; margin: 0 auto; padding: 40px 24px; }
+            .container { padding: 40px 24px; }
             .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
             h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
             .subtitle { color: var(--muted); font-size: 13px; margin: 0; }
@@ -102,16 +102,21 @@
             .sidebar__search-input:focus { outline: none; border-color: var(--accent); }
             .sidebar__list { flex: 1; padding: 4px 8px 16px; display: flex; flex-direction: column; gap: 2px; }
             .sidebar__item {
-                display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 6px;
+                display: flex; flex-direction: column; gap: 2px; padding: 7px 8px; border-radius: 6px;
                 color: var(--fg); text-decoration: none; font-size: 12.5px;
             }
             .sidebar__item:hover { background: color-mix(in srgb, var(--fg) 6%, transparent); text-decoration: none; }
             .sidebar__item--active { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+            .sidebar__item-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
             .sidebar__item-path {
                 overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
                 font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--muted);
             }
             .sidebar__item--active .sidebar__item-path { color: var(--fg); }
+            .sidebar__item-description {
+                overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+                padding-left: 2px; color: var(--muted); font-size: 11.5px;
+            }
             .sidebar__empty { padding: 12px 16px; font-size: 12.5px; color: var(--muted); }
             @media (max-width: 768px) {
                 .app-shell { flex-direction: column; }
@@ -169,6 +174,7 @@
             .input:focus, select.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
             .input.is-invalid { border-color: var(--danger); }
             .input.is-invalid:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 20%, transparent); }
+            .description-input { resize: vertical; }
 
             .form-section + .form-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
             .form-section__title {

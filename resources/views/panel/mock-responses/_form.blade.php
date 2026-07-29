@@ -1,6 +1,7 @@
 @php
     $method = old('method', $entry['method'] ?? 'GET');
     $path = old('path', $entry['path'] ?? '');
+    $description = old('description', $entry['description'] ?? '');
     $status = old('status', $entry['status'] ?? 200);
     $response = old('response', isset($entry) ? json_encode($entry['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : "{\n    \n}");
     $validationRules = old('validation_rules', ! empty($entry['validation_rules'] ?? null)
@@ -63,6 +64,23 @@
         </p>
 
         @error('path')
+            <p class="field-error">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div class="field">
+        <label for="description">Description <span class="hint">— optional, shown in the endpoint list</span></label>
+        <textarea
+            id="description"
+            name="description"
+            class="input description-input @if ($errors->has('description')) is-invalid @endif"
+            rows="2"
+            maxlength="500"
+            placeholder="What this endpoint is for…"
+            @if ($errors->has('description')) aria-invalid="true" @endif
+        >{{ $description }}</textarea>
+
+        @error('description')
             <p class="field-error">{{ $message }}</p>
         @enderror
     </div>
