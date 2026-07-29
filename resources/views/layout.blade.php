@@ -250,7 +250,7 @@
             .json-editor--invalid { border-color: var(--danger); }
             .json-editor pre, .json-editor textarea {
                 margin: 0; position: absolute; top: 0; right: 0; bottom: 0; left: 0; padding: 12px; overflow: auto;
-                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; line-height: 1.6;
+                font-family: 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace; font-size: 12.5px; line-height: 1.6;
                 white-space: pre; tab-size: 4;
                 letter-spacing: normal; word-spacing: normal; font-kerning: none; font-variant-ligatures: none;
                 -webkit-font-smoothing: antialiased; text-rendering: optimizeSpeed;
