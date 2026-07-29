@@ -23,6 +23,11 @@
                 --error-fg: #b91c1c;
                 --code-bg: #282c34;
                 --code-fg: #abb2bf;
+                --tok-key: #e06c75;
+                --tok-string: #98c379;
+                --tok-number: #d19a66;
+                --tok-boolean: #56b6c2;
+                --tok-null: #5c6370;
                 --m-get: #2563eb;
                 --m-post: #15803d;
                 --m-put: #b45309;
@@ -240,15 +245,20 @@
 
             .actions-row { display: flex; align-items: center; gap: 12px; margin-top: 24px; }
 
-            .json-textarea {
+            .json-editor {
                 display: block; width: 100%; height: 320px; margin: 0; padding: 12px; box-sizing: border-box;
                 border: 1px solid var(--border); border-radius: 8px; background: var(--code-bg); color: var(--code-fg);
                 font-family: 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace; font-size: 12.5px; line-height: 1.6;
-                white-space: pre; tab-size: 4; overflow: auto; resize: vertical;
-                transition: border-color 150ms ease;
+                white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 4; overflow: auto; resize: vertical;
+                transition: border-color 150ms ease; caret-color: var(--code-fg);
             }
-            .json-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
-            .json-textarea--invalid { border-color: var(--danger); }
+            .json-editor:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+            .json-editor--invalid { border-color: var(--danger); }
+            .tok-key { color: var(--tok-key); }
+            .tok-string { color: var(--tok-string); }
+            .tok-number { color: var(--tok-number); }
+            .tok-boolean { color: var(--tok-boolean); }
+            .tok-null { color: var(--tok-null); font-style: italic; }
             .json-toolbar { display: flex; align-items: center; margin-top: 8px; }
             .json-status { font-size: 12px; }
             .json-status--ok { color: var(--success-fg); }
@@ -278,43 +288,176 @@
 
         <script>
             (function () {
-                function initJsonField(textarea) {
-                    var statusEl = textarea.parentElement.querySelector('[data-json-status]');
+                function escapeHtml(str) {
+                    return str
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
 
-                    function validate() {
+                function highlightJson(source) {
+                    var escaped = escapeHtml(source);
+
+                    return escaped.replace(
+                        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
+                        function (match) {
+                            var cls = 'tok-number';
+
+                            if (/^"/.test(match)) {
+                                cls = /:$/.test(match) ? 'tok-key' : 'tok-string';
+                            } else if (/^(true|false)$/.test(match)) {
+                                cls = 'tok-boolean';
+                            } else if (match === 'null') {
+                                cls = 'tok-null';
+                            }
+
+                            return '<span class="' + cls + '">' + match + '</span>';
+                        }
+                    );
+                }
+
+                // Caret position is tracked as a plain character offset into root.textContent,
+                // not pixel geometry — this is what keeps the caret correct across re-highlighting.
+                function getCaretOffset(root) {
+                    var selection = window.getSelection();
+                    if (!selection.rangeCount) return 0;
+
+                    var range = selection.getRangeAt(0);
+                    if (!root.contains(range.startContainer)) return 0;
+
+                    var preRange = range.cloneRange();
+                    preRange.selectNodeContents(root);
+                    preRange.setEnd(range.startContainer, range.startOffset);
+                    return preRange.toString().length;
+                }
+
+                function setCaretOffset(root, offset) {
+                    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+                    var node = walker.nextNode();
+                    var remaining = offset;
+                    var target = null;
+                    var targetOffset = 0;
+
+                    while (node) {
+                        if (remaining <= node.textContent.length) {
+                            target = node;
+                            targetOffset = remaining;
+                            break;
+                        }
+                        remaining -= node.textContent.length;
+                        node = walker.nextNode();
+                    }
+
+                    var range = document.createRange();
+                    var selection = window.getSelection();
+
+                    if (target) {
+                        range.setStart(target, targetOffset);
+                    } else {
+                        range.selectNodeContents(root);
+                        range.collapse(false);
+                    }
+
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+
+                function initJsonEditor(root) {
+                    var source = document.getElementById(root.getAttribute('data-json-editor'));
+                    var statusEl = root.parentElement.querySelector('[data-json-status]');
+                    var composing = false;
+
+                    function validate(text) {
                         try {
-                            JSON.parse(textarea.value);
+                            JSON.parse(text);
                             if (statusEl) {
                                 statusEl.textContent = 'Valid JSON';
                                 statusEl.className = 'json-status json-status--ok';
                             }
-                            textarea.classList.remove('json-textarea--invalid');
+                            root.classList.remove('json-editor--invalid');
                         } catch (e) {
                             if (statusEl) {
                                 statusEl.textContent = 'Invalid JSON — ' + e.message;
                                 statusEl.className = 'json-status json-status--error';
                             }
-                            textarea.classList.add('json-textarea--invalid');
+                            root.classList.add('json-editor--invalid');
                         }
                     }
 
-                    textarea.addEventListener('input', validate);
+                    function render() {
+                        var hasFocus = document.activeElement === root;
+                        var text = root.textContent;
+                        var offset = hasFocus ? getCaretOffset(root) : null;
 
-                    textarea.addEventListener('keydown', function (e) {
-                        if (e.key === 'Tab') {
+                        root.innerHTML = highlightJson(text);
+
+                        if (hasFocus) {
+                            setCaretOffset(root, offset);
+                        }
+
+                        source.value = text;
+                        validate(text);
+                    }
+
+                    root.addEventListener('input', function () {
+                        if (composing) return;
+                        render();
+                    });
+
+                    root.addEventListener('compositionstart', function () { composing = true; });
+                    root.addEventListener('compositionend', function () {
+                        composing = false;
+                        render();
+                    });
+
+                    // Deliberately not using execCommand('insertText', ...) here — it silently
+                    // no-ops when the selection is anchored inside an existing text node (only
+                    // works from a freshly-collapsed selection), which is the normal case once
+                    // there's content in the field. Direct Range manipulation is reliable instead.
+                    function insertTextAtCaret(text) {
+                        var selection = window.getSelection();
+                        if (!selection.rangeCount) return;
+                        var range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        var textNode = document.createTextNode(text);
+                        range.insertNode(textNode);
+                        range.setStartAfter(textNode);
+                        range.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+
+                    root.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') {
                             e.preventDefault();
-                            var start = textarea.selectionStart;
-                            var end = textarea.selectionEnd;
-                            textarea.value = textarea.value.slice(0, start) + '    ' + textarea.value.slice(end);
-                            textarea.selectionStart = textarea.selectionEnd = start + 4;
-                            validate();
+                            insertTextAtCaret('\n');
+                            render();
+                        } else if (e.key === 'Tab') {
+                            e.preventDefault();
+                            insertTextAtCaret('    ');
+                            render();
                         }
                     });
 
-                    validate();
+                    root.addEventListener('paste', function (e) {
+                        e.preventDefault();
+                        var text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                        insertTextAtCaret(text);
+                        render();
+                    });
+
+                    var form = root.closest('form');
+                    if (form) {
+                        form.addEventListener('submit', function () {
+                            source.value = root.textContent;
+                        });
+                    }
+
+                    render();
                 }
 
-                document.querySelectorAll('.json-textarea').forEach(initJsonField);
+                document.querySelectorAll('[data-json-editor]').forEach(initJsonEditor);
 
                 var methodSelect = document.getElementById('method');
 

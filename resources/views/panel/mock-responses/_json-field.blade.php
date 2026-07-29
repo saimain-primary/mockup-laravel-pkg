@@ -13,15 +13,19 @@
         @if (! $panel['active']) hidden @endif
     @endisset
 >
-    <label for="{{ $name }}">{{ $label }} @isset($hint)<span class="hint">{{ $hint }}</span>@endisset</label>
-    <textarea
-        id="{{ $name }}"
-        name="{{ $name }}"
-        class="json-textarea @if ($hasError) json-textarea--invalid @endif"
-        style="height: {{ $height }};"
+    <label for="{{ $name }}-editor">{{ $label }} @isset($hint)<span class="hint">{{ $hint }}</span>@endisset</label>
+    <div
+        id="{{ $name }}-editor"
+        class="json-editor @if ($hasError) json-editor--invalid @endif"
+        contenteditable="true"
         spellcheck="false"
+        role="textbox"
+        aria-multiline="true"
+        data-json-editor="{{ $name }}"
+        style="height: {{ $height }};"
         @if ($hasError) aria-invalid="true" @endif
-    >{{ $value }}</textarea>
+    >{{ $value }}</div>
+    <textarea id="{{ $name }}" name="{{ $name }}" hidden>{{ $value }}</textarea>
     <div class="json-toolbar">
         <span data-json-status class="json-status"></span>
     </div>
