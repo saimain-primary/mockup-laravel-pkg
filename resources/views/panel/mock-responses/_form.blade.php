@@ -3,6 +3,9 @@
     $path = old('path', $entry['path'] ?? '');
     $status = old('status', $entry['status'] ?? 200);
     $response = old('response', isset($entry) ? json_encode($entry['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : "{\n    \n}");
+    $validationRules = old('validation_rules', ! empty($entry['validation_rules'] ?? null)
+        ? json_encode($entry['validation_rules'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        : "{}");
 @endphp
 
 <div class="field">
@@ -27,14 +30,17 @@
     <input type="number" id="status" name="status" value="{{ $status }}" class="input input-sm">
 </div>
 
-<div class="field">
-    <label for="response">Response body <span class="hint">— JSON</span></label>
-    <div class="json-editor">
-        <pre class="json-editor__highlight" aria-hidden="true"><code></code></pre>
-        <textarea id="response" name="response" class="json-editor__textarea" spellcheck="false">{{ $response }}</textarea>
-    </div>
-    <div class="json-toolbar">
-        <button type="button" class="btn btn-text" data-json-format>Format JSON</button>
-        <span data-json-status class="json-status"></span>
-    </div>
-</div>
+@include('mock-api::panel.mock-responses._json-field', [
+    'name' => 'validation_rules',
+    'label' => 'Validation rules',
+    'hint' => '— optional. Laravel rules per field, e.g. {"email": "required|email"}. Leave as {} to skip validation and always return the response below.',
+    'value' => $validationRules,
+    'height' => '160px',
+])
+
+@include('mock-api::panel.mock-responses._json-field', [
+    'name' => 'response',
+    'label' => 'Response body',
+    'hint' => '— JSON, returned when validation passes (or when no rules are set)',
+    'value' => $response,
+])

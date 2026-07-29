@@ -28,6 +28,7 @@ class MockResponseRequest extends FormRequest
             'method' => ['required', Rule::in(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])],
             'path' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9\-_\/]+$/i'],
             'status' => ['required', 'integer', 'between:100,599'],
+            'validation_rules' => ['nullable', 'json'],
             'response' => ['required', 'json'],
         ];
     }
@@ -42,6 +43,12 @@ class MockResponseRequest extends FormRequest
 
             if ($existing && $existing['id'] !== $editingId) {
                 $validator->errors()->add('path', 'A mock already exists for this method and path.');
+            }
+
+            $rules = $this->input('validation_rules');
+
+            if (filled($rules) && ! is_array(json_decode($rules, true))) {
+                $validator->errors()->add('validation_rules', 'Validation rules must be a JSON object of field => rule strings.');
             }
         });
     }

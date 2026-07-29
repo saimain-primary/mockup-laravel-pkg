@@ -87,7 +87,7 @@
             form { margin: 0; }
             .field { margin-bottom: 18px; }
             .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-            .field .hint { color: var(--muted); font-weight: 400; }
+            .hint { color: var(--muted); font-weight: 400; }
             .input, select.input {
                 width: 100%; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); color: var(--fg);
                 padding: 8px 10px; font-size: 13px; font-family: inherit;

@@ -46,6 +46,7 @@ class MockResponseStore
             'method' => strtoupper($data['method']),
             'path' => trim($data['path'], '/'),
             'status' => (int) $data['status'],
+            'validation_rules' => $data['validation_rules'] ?? [],
             'response' => $data['response'],
         ];
 
@@ -67,6 +68,7 @@ class MockResponseStore
                 'method' => strtoupper($data['method']),
                 'path' => trim($data['path'], '/'),
                 'status' => (int) $data['status'],
+                'validation_rules' => $data['validation_rules'] ?? [],
                 'response' => $data['response'],
             ];
         }, $this->all());

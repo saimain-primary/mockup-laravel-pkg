@@ -22,6 +22,7 @@
                     <th>Method</th>
                     <th>Path</th>
                     <th>Status</th>
+                    <th>Validation</th>
                     <th style="text-align: right;">Actions</th>
                 </tr>
             </thead>
@@ -31,6 +32,13 @@
                         <td><span class="method-badge">{{ $entry['method'] }}</span></td>
                         <td><code>/{{ config('mock-api.api_prefix') }}/{{ $entry['path'] }}</code></td>
                         <td>{{ $entry['status'] }}</td>
+                        <td>
+                            @if (! empty($entry['validation_rules'] ?? null))
+                                <span class="method-badge">{{ count($entry['validation_rules']) }} rule{{ count($entry['validation_rules']) === 1 ? '' : 's' }}</span>
+                            @else
+                                <span class="hint">—</span>
+                            @endif
+                        </td>
                         <td style="text-align: right;">
                             <a href="{{ route('mock-api.panel.mock-responses.edit', $entry['id']) }}">Edit</a>
                             &nbsp;·&nbsp;
@@ -43,7 +51,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="empty-state">No mock endpoints yet.</td>
+                        <td colspan="5" class="empty-state">No mock endpoints yet.</td>
                     </tr>
                 @endforelse
             </tbody>

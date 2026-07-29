@@ -54,6 +54,9 @@ class MockResponseController extends Controller
     {
         $data = $request->validated();
         $data['response'] = json_decode($data['response'], true);
+        $data['validation_rules'] = filled($data['validation_rules'] ?? null)
+            ? (json_decode($data['validation_rules'], true) ?: [])
+            : [];
 
         return $data;
     }

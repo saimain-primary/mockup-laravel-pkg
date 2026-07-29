@@ -5,6 +5,7 @@ namespace Saimain\LaravelMockApi\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
 use Saimain\LaravelMockApi\Support\MockResponseStore;
 
 class MockApiController extends Controller
@@ -18,6 +19,19 @@ class MockApiController extends Controller
                 'success' => false,
                 'message' => 'Mock endpoint not found.',
             ], 404);
+        }
+
+        $rules = $entry['validation_rules'] ?? [];
+
+        if (! empty($rules)) {
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => $validator->errors()->first(),
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
         }
 
         return response()->json($entry['response'], $entry['status']);
