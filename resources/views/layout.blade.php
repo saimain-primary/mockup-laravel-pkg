@@ -385,19 +385,23 @@
                         }
                     }
 
-                    function render() {
-                        var hasFocus = document.activeElement === root;
-                        var text = root.textContent;
-                        var offset = hasFocus ? getCaretOffset(root) : null;
-
+                    function applyText(text, offset) {
                         root.innerHTML = highlightJson(text);
 
-                        if (hasFocus) {
+                        if (offset !== null) {
                             setCaretOffset(root, offset);
                         }
 
                         source.value = text;
                         validate(text);
+                    }
+
+                    function render() {
+                        var hasFocus = document.activeElement === root;
+                        var text = root.textContent;
+                        var offset = hasFocus ? getCaretOffset(root) : null;
+
+                        applyText(text, offset);
                     }
 
                     root.addEventListener('input', function () {
@@ -428,6 +432,21 @@
                         selection.addRange(range);
                     }
 
+                    function dedentCurrentLine() {
+                        var offset = getCaretOffset(root);
+                        var text = root.textContent;
+                        var lineStart = text.lastIndexOf('\n', offset - 1) + 1;
+                        var match = /^(\t| {1,4})/.exec(text.slice(lineStart));
+
+                        if (!match) return;
+
+                        var removeCount = match[0].length;
+                        var newText = text.slice(0, lineStart) + text.slice(lineStart + removeCount);
+                        var newOffset = Math.max(lineStart, offset - removeCount);
+
+                        applyText(newText, newOffset);
+                    }
+
                     root.addEventListener('keydown', function (e) {
                         if (e.key === 'Enter') {
                             e.preventDefault();
@@ -435,8 +454,12 @@
                             render();
                         } else if (e.key === 'Tab') {
                             e.preventDefault();
-                            insertTextAtCaret('    ');
-                            render();
+                            if (e.shiftKey) {
+                                dedentCurrentLine();
+                            } else {
+                                insertTextAtCaret('    ');
+                                render();
+                            }
                         }
                     });
 
