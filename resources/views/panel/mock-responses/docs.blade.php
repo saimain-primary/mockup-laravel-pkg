@@ -23,7 +23,6 @@
                 <p class="subtitle">{{ $entry['description'] }}</p>
             @endif
         </div>
-        <a href="{{ route('mock-api.panel.mock-responses.edit', $entry['id']) }}" class="btn btn-secondary">Edit endpoint</a>
     </div>
 
     <div class="docs-grid">
